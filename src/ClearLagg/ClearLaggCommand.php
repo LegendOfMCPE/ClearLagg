@@ -47,7 +47,21 @@ class ClearLaggCommand extends Command implements PluginIdentifiableCommand {
           // TODO
           return true;
         case "unloadchunks":
-          // TODO
+          
+	      	$chunksCollected = 0;
+	      	$entitiesCollected = 0;
+	      	$tilesCollected = 0;
+	      	$memory = memory_get_usage();
+		      foreach($sender->getServer()->getLevels() as $level){
+		      	$diff = [count($level->getChunks()), count($level->getEntities()), count($level->getTiles())];
+		      	$level->doChunkGarbageCollection();
+			      $level->unloadChunks(true);
+			      $chunksCollected += $diff[0] - count($level->getChunks());
+		      	$entitiesCollected += $diff[1] - count($level->getEntities());
+		      	$tilesCollected += $diff[2] - count($level->getTiles());
+			      $level->clearCache(true);
+		      }
+		      $sender->sendMessage(TextFormat::GOLD . "Chunks " . TextFormat::RED . number_format($chunksCollected). " unloaded!");
           return true;
         case "chunk":
           // TODO
